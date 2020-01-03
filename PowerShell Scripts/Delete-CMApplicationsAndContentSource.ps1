@@ -110,7 +110,7 @@ Foreach ($ApplicationName in $ApplicationsToDelete)
         $ContentLocations = New-Object System.Collections.ArrayList      
         foreach ($DeploymentType in $DeploymentTypes)
         {      
-            [xml]$OuterXML = $DeploymentTypes[0].OuterXml
+            [xml]$OuterXML = $DeploymentType.OuterXml
             $PackageSource = $OuterXML.DeploymentType.Installer.Contents.Content.Location
             Write-host "  Found deployment type content source: '$PackageSource'" -ForegroundColor Green
             [void]$ContentLocations.Add($PackageSource)
