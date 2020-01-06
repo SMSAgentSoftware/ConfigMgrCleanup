@@ -22,9 +22,9 @@
 $PackagesToDelete = Import-CSV -Path "C:\Temp\Driver Packages To Delete.csv"
 
 # Variables
-$script:dataSource = 'HTSSCCMAG01' 
-$script:database = 'CM_HET'
-$PackageSource = "\\sccm-sofs\PackageSource" # Package source share. This will be used to help identify content source locations that may be used by other content in ConfigMgr.
+$script:dataSource = 'MyConfigMgrSQLServer' 
+$script:database = 'CM_ABC'
+$PackageSource = "\\FileServer\PackageSource" # Package source share. This will be used to help identify content source locations that may be used by other content in ConfigMgr.
 
 
 # Function to query ConfigMgr database
