@@ -172,7 +172,17 @@ Foreach ($Location in ($PackageSourceList | Select -Unique))
         # Need to use RMDIR as Remove-Item does not like 'illegal' characters
         $cmdstring = "/c RMDIR /S /Q ""$Location"""
         cmd.exe $cmdstring
-        [void]$SuccessfulDeletions.Add("$Location")
+        If ($?)
+        {
+            [void]$SuccessfulDeletions.Add("$Location")
+        }
+        Else
+        {
+            [void]$UnsuccessfulDeletions.Add([pscustomobject]@{
+                Path = "$Location"
+                Error = $Error[0].Exception
+            })
+        }
     }
     Catch
     {
