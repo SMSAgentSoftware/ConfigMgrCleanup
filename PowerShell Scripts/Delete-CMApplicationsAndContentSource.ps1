@@ -180,7 +180,7 @@ Foreach ($Location in ($PackageSourceList | Select -Unique))
         {
             [void]$UnsuccessfulDeletions.Add([pscustomobject]@{
                 Path = "$Location"
-                Error = $Error[0].Exception
+                Error = $Error[0].Exception.Message
             })
         }
     }
