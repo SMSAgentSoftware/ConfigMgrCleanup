@@ -103,33 +103,41 @@ Foreach ($ApplicationName in $ApplicationsToDelete)
     {
         Write-host "  Found app" -ForegroundColor Green
 
-        # Get DTs and content source locations
-        [xml]$AppXML = $App.SDMPackageXML
-        [array]$DeploymentTypes = $AppXML.AppMgmtDigest.DeploymentType
-        Write-Host "  Found $($DeploymentTypes.Count) deployment type/s" -ForegroundColor Green 
-        $ContentLocations = New-Object System.Collections.ArrayList      
-        foreach ($DeploymentType in $DeploymentTypes)
-        {      
-            [xml]$OuterXML = $DeploymentType.OuterXml
-            $PackageSource = $OuterXML.DeploymentType.Installer.Contents.Content.Location
-            Write-host "  Found deployment type content source: '$PackageSource'" -ForegroundColor Green
-            [void]$ContentLocations.Add($PackageSource)
-        }
-
-        # Delete App
-        Try
+        # Check for dependencies
+        If ($App.NumberOfDependentDTs + $app.NumberOfDependentTS -ge 1)
         {
-            $App | Remove-CMApplication -Force -ErrorAction Stop
-            Write-Host "  Successfully deleted app!" -ForegroundColor Green
-            foreach ($ContentLocation in $ContentLocations)
-            {
-                [void]$PackageSourceList.Add($ContentLocation)
+            Write-host "  App is a dependency...cannot delete" -ForegroundColor Yellow
+        }
+        Else
+        {
+            # Get DTs and content source locations
+            [xml]$AppXML = $App.SDMPackageXML
+            [array]$DeploymentTypes = $AppXML.AppMgmtDigest.DeploymentType
+            Write-Host "  Found $($DeploymentTypes.Count) deployment type/s" -ForegroundColor Green 
+            $ContentLocations = New-Object System.Collections.ArrayList      
+            foreach ($DeploymentType in $DeploymentTypes)
+            {      
+                [xml]$OuterXML = $DeploymentType.OuterXml
+                $PackageSource = $OuterXML.DeploymentType.Installer.Contents.Content.Location
+                Write-host "  Found deployment type content source: '$PackageSource'" -ForegroundColor Green
+                [void]$ContentLocations.Add($PackageSource)
             }
-        }
-        Catch
-        {
-            Write-Host "  An error occured attempting to delete the app: $_" -ForegroundColor Red
-            Continue
+
+            # Delete App
+            Try
+            {
+                $App | Remove-CMApplication -Force -ErrorAction Stop
+                Write-Host "  Successfully deleted app!" -ForegroundColor Green
+                foreach ($ContentLocation in $ContentLocations)
+                {
+                    [void]$PackageSourceList.Add($ContentLocation)
+                }
+            }
+            Catch
+            {
+                Write-Host "  An error occured attempting to delete the app: $_" -ForegroundColor Red
+                Continue
+            }
         }
     }
     Else
